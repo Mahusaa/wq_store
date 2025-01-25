@@ -1,7 +1,25 @@
+"use client"
 import { Button } from '~/components/ui/button';
 import { ArrowRight, CreditCard, Database } from 'lucide-react';
-
+import { addToCart } from '~/lib/cart';
+import { toast } from 'sonner';
 export default function HomePage() {
+  const handleAddToCart = () => {
+    addToCart({
+      productId: "string",
+      variantId: "string",
+      quantity: 2,
+      name: "naga",
+      price: 500000,
+      color: "blue",
+      size: "XL",
+      image: "/placeholder.svg?height=600&width=600",
+    })
+    toast.success("Added to cart", {
+      duration: 1000,
+    })
+    window.dispatchEvent(new Event("storage"))
+  }
   return (
     <main>
       <section className="py-20">
@@ -17,6 +35,7 @@ export default function HomePage() {
                 ready-to-use template. Packed with modern technologies and
                 essential integrations.
               </p>
+              <Button onClick={handleAddToCart}>Cart</Button>
               <div className="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left lg:mx-0">
                 <a
                   href="https://vercel.com/templates/next.js/next-js-saas-starter"

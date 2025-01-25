@@ -1,52 +1,66 @@
-import { create } from "zustand"
-import { persist } from "zustand/middleware"
-import type { CartItem } from "~/types/cart"
-
-interface CartStore {
-  items: CartItem[]
-  addItem: (item: CartItem) => void
-  removeItem: (variantId: string) => void
-  updateQuantity: (variantId: string, quantity: number) => void
-  clearCart: () => void
-  total: number
+export interface CartItem {
+  productId: string;
+  variantId: string;
+  quantity: number;
+  name: string;
+  price: number;
+  color: string;
+  size: string;
+  image: string;
 }
 
-export const useCart = create<CartStore>()(
-  persist(
-    (set, get) => ({
-      items: [],
-      addItem: (newItem) => {
-        set((state) => {
-          const existingItem = state.items.find((item) => item.variantId === newItem.variantId)
-          if (existingItem) {
-            return {
-              items: state.items.map((item) =>
-                item.variantId === newItem.variantId ? { ...item, quantity: item.quantity + newItem.quantity } : item,
-              ),
-            }
-          }
-          return { items: [...state.items, newItem] }
-        })
-      },
-      removeItem: (variantId) => {
-        set((state) => ({
-          items: state.items.filter((item) => item.variantId !== variantId),
-        }))
-      },
-      updateQuantity: (variantId, quantity) => {
-        set((state) => ({
-          items: state.items.map((item) => (item.variantId === variantId ? { ...item, quantity } : item)),
-        }))
-      },
-      clearCart: () => set({ items: [] }),
-      get total() {
-        return get().items.reduce((total, item) => total + item.price * item.quantity, 0)
-      },
-    }),
-    {
-      name: "cart-storage",
-    },
-  ),
-)
+
+const CART_STORAGE_KEY = "we-are-here-cart"
+
+export function getCart(): CartItem[] {
+  if (typeof window === "undefined") return []
+  const cart = localStorage.getItem(CART_STORAGE_KEY)
+  return cart ? JSON.parse(cart) as CartItem[] : []
+}
+
+export function setCart(cart: CartItem[]): void {
+  if (typeof window === "undefined") return
+  localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart))
+}
+
+export function addToCart(item: CartItem): void {
+  const cart = getCart();
+  const existingItemIndex = cart.findIndex(
+    (cartItem) => cartItem.variantId === item.variantId
+  );
+
+  if (existingItemIndex > -1) {
+    const existingItem = cart[existingItemIndex];
+    if (existingItem) {
+      existingItem.quantity += item.quantity;
+    }
+  } else {
+    cart.push(item);
+  }
+
+  setCart(cart);
+}
+
+
+export function removeFromCart(variantId: string): void {
+  const cart = getCart()
+  const updatedCart = cart.filter((item) => item.variantId !== variantId)
+  setCart(updatedCart)
+}
+
+export function updateCartItemQuantity(variantId: string, quantity: number): void {
+  const cart = getCart()
+  const updatedCart = cart.map((item) => (item.variantId === variantId ? { ...item, quantity } : item))
+  setCart(updatedCart)
+}
+
+export function clearCart(): void {
+  setCart([])
+}
+
+export function getCartTotal(): number {
+  const cart = getCart()
+  return cart.reduce((total, item) => total + item.price * item.quantity, 0)
+}
 
 
