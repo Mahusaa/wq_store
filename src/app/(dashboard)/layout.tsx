@@ -1,10 +1,13 @@
-'use client';
+"use client"
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from "~/components/ui/sheet"
+import { Button } from "~/components/ui/button"
+import { Menu } from "lucide-react"
+import Link from "next/link"
+import dynamic from "next/dynamic"
 
-import Link from 'next/link';
-import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetDescription, SheetTitle } from '~/components/ui/sheet';
-import { Button } from '~/components/ui/button';
-import { CircleIcon, Home, LogOut, Menu } from 'lucide-react';
-
+const ThemeToggle = dynamic(() => import("~/components/theme-toogle").then((mod) => mod.ThemeToggle), {
+  ssr: false,
+})
 
 const categories = [
   { name: "All Products", href: "/" },
@@ -12,17 +15,8 @@ const categories = [
   { name: "T-Shirts", href: "/?category=t-shirts" },
   { name: "Accessories", href: "/?category=accessories" },
 ]
-function Header() {
-  // const [isMenuOpen, setIsMenuOpen] = useState(false);
-  // const { user, setUser } = useUser();
-  // const router = useRouter();
 
-  // async function handleSignOut() {
-  //   setUser(null);
-  //   await signOut();
-  //   router.push('/');
-  // }
-  //
+function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="w-full flex h-16 items-center px-4">
@@ -37,67 +31,57 @@ function Header() {
           <SheetContent side="left">
             <SheetHeader>
               <SheetTitle className="font-mono">Menu</SheetTitle>
-              <SheetDescription>
-                <nav className="flex flex-col space-y-4">
-                  {categories.map((category) => (
-                    <Link
-                      key={category.href}
-                      href={category.href}
-                      className="text-sm font-mono hover:text-accent"
-                    >
-                      {category.name}
-                    </Link>
-                  ))}
-                </nav>
-                {/* Horizontal rule separated outside of <p> */}
-                <hr className="border-t border-border my-2" />
-                <div>
-                  <button className="justify-start p-0">
-                    <Link href="/login" className="text-sm hover:text-accent">
-                      Log in
-                    </Link>
-                  </button>
-                  <button className="justify-start p-0">
-                    <Link href="/signup" className="text-sm hover:text-accent">
-                      Sign up
-                    </Link>
-                  </button>
-                </div>
-              </SheetDescription>
             </SheetHeader>
+            <div className="mt-4">
+              <nav className="flex flex-col space-y-4">
+                {categories.map((category) => (
+                  <Link key={category.href} href={category.href} className="text-sm font-mono group">
+                    {category.name}
+                  </Link>
+                ))}
+              </nav>
+              <hr className="border-t border-border my-4" />
+              <div className="flex flex-col space-y-2">
+                <Link href="/login" className="text-sm hover:text-accent">
+                  Log in
+                </Link>
+                <Link href="/signup" className="text-sm hover:text-accent">
+                  Sign up
+                </Link>
+              </div>
+            </div>
           </SheetContent>
         </Sheet>
         {/* Logo and Desktop Menu */}
         <div className="flex w-full items-center justify-between gap-4">
           <div className="flex items-center space-x-4 ml-3">
-            <Link href="/" className="text-xl font-bold font-mono">
-              @wqstore
+            <Link href="/" className="font-bold font-mono text-2xl">
+              @wqstore | tech bro
             </Link>
             <nav className="hidden md:flex items-center space-x-6">
               {categories.map((category) => (
-                <Link
-                  key={category.href}
-                  href={category.href}
-                  className="text-sm font-mono hover:text-accent"
-                >
-                  {category.name}
+                <Link key={category.href} href={category.href} className="text-sm font-mono relative group text-primary">
+                  <span className="relative z-10 transition-colors duration-200 ease-in-out ">
+                    {category.name}
+                  </span>
+                  <span className="absolute inset-x-0 bottom-0 h-0.5 bg-primary transform scale-x-0 transition-transform duration-200 ease-in-out origin-left group-hover:scale-x-100"></span>
                 </Link>
               ))}
             </nav>
           </div>
           {/* Desktop Auth Buttons */}
           <div className="flex gap-4">
-            <div className="hidden md:flex gap-2">
+            <div className="hidden md:flex gap-2 items-center">
               <Button variant="ghost" size="sm">
                 Log in
               </Button>
-              <Button size="sm">Sign up</Button>
+              <ThemeToggle />
             </div>
           </div>
         </div>
       </div>
     </header>
-  );
+  )
 }
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -106,5 +90,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <Header />
       {children}
     </section>
-  );
+  )
 }
+
+
