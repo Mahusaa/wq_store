@@ -75,9 +75,14 @@ function Header() {
 
 
 
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3">
           <CartSheet />
           <ThemeToggle />
+          <Link href="/sign-in">
+            <Button variant="ghost" className="hidden sm:block">
+              Sign In
+            </Button>
+          </Link>
         </div>
       </div>
     </header>
