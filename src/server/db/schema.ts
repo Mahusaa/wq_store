@@ -49,3 +49,5 @@ export const users = createTable('users', {
   deletedAt: timestamp('deleted_at'),
 });
 
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferSelect;

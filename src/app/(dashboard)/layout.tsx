@@ -11,10 +11,10 @@ const ThemeToggle = dynamic(() => import("~/components/theme-toogle").then((mod)
 })
 
 const categories = [
-  { name: "All Products", href: "/" },
-  { name: "Hats", href: "/?category=hats" },
-  { name: "T-Shirts", href: "/?category=t-shirts" },
-  { name: "Accessories", href: "/?category=accessories" },
+  { name: "all products", href: "/" },
+  { name: "hats", href: "/?category=hats" },
+  { name: "t-shirts", href: "/?category=t-shirts" },
+  { name: "accessories", href: "/?category=accessories" },
 ]
 
 function Header() {
@@ -79,8 +79,8 @@ function Header() {
           <CartSheet />
           <ThemeToggle />
           <Link href="/sign-in">
-            <Button variant="ghost" className="hidden sm:block">
-              Sign In
+            <Button variant="ghost" className="hidden sm:block font-mono">
+              sign in
             </Button>
           </Link>
         </div>
