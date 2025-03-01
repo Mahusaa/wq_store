@@ -1,10 +1,17 @@
 "use client"
+
+import { useState } from "react"
 import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from "~/components/ui/sheet"
 import { Button } from "~/components/ui/button"
-import { Menu } from "lucide-react"
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuItem, DropdownMenuContent } from "~/components/ui/dropdown-menu"
+import { Avatar, AvatarImage, AvatarFallback } from "~/components/ui/avatar"
+import { Menu, Home, LogOut } from "lucide-react"
 import Link from "next/link"
 import dynamic from "next/dynamic"
 import CartSheet from "~/components/cart-sheet"
+import { useUser } from "~/server/auth"
+import { useRouter } from "next/navigation"
+import { signOut } from "../(login)/action"
 
 const ThemeToggle = dynamic(() => import("~/components/theme-toogle").then((mod) => mod.ThemeToggle), {
   ssr: false,
@@ -18,6 +25,15 @@ const categories = [
 ]
 
 function Header() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, setUser } = useUser();
+  const router = useRouter();
+
+  async function handleSignOut() {
+    setUser(null);
+    await signOut();
+    router.push('/');
+  }
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-2">
       <div className="w-full flex h-14 items-center justify-between px-4 mx-auto">
@@ -78,11 +94,43 @@ function Header() {
         <div className="flex items-center space-x-3">
           <CartSheet />
           <ThemeToggle />
-          <Link href="/sign-in">
-            <Button variant="ghost" className="hidden sm:block font-mono">
-              sign in
-            </Button>
-          </Link>
+          {user ? (
+            <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+              <DropdownMenuTrigger>
+                <Avatar className="cursor-pointer size-9">
+                  <AvatarImage alt={user.name ?? ''} />
+                  <AvatarFallback>
+                    {user.email
+                      .split(' ')
+                      .map((n) => n[0])
+                      .join('')}
+                  </AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="flex flex-col gap-1">
+                <DropdownMenuItem className="cursor-pointer">
+                  <Link href="/dashboard" className="flex w-full items-center font-mono">
+                    <Home className="mr-2 h-4 w-4" />
+                    <span>dashboard</span>
+                  </Link>
+                </DropdownMenuItem>
+                <form action={handleSignOut} className="w-full">
+                  <button type="submit" className="flex w-full font-mono">
+                    <DropdownMenuItem className="w-full flex-1 cursor-pointer">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>sign out</span>
+                    </DropdownMenuItem>
+                  </button>
+                </form>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link href="/sign-in">
+              <Button variant="ghost" className="hidden sm:block font-mono">
+                sign in
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
     </header>

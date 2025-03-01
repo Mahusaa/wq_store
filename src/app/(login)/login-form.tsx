@@ -6,12 +6,17 @@ import { useSearchParams } from 'next/navigation';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Label } from '~/components/ui/label';
-import { CircleIcon, Loader2, KeyIcon, AtSign } from 'lucide-react';
+import { Loader2, KeyIcon, AtSign } from 'lucide-react';
+import type { ActionState } from '~/server/auth/middleware';
+import { signIn, signUp } from './action';
 
 export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
   const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect');
-  const pending = false
+  const [state, formAction, pending] = useActionState<ActionState, FormData>(
+    mode === "signin" ? signIn : signUp,
+    { error: '' }
+  )
 
   return (
     <div className="min-h-[100dvh] flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
@@ -27,7 +32,7 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <form className="space-y-6" >
+        <form className="space-y-6" action={formAction} >
           <div>
             <Label
               className="mb-3 mt-5 block text-xs font-medium text-primary"
@@ -67,6 +72,10 @@ export function Login({ mode = 'signin' }: { mode?: 'signin' | 'signup' }) {
               <KeyIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-primary" />
             </div>
           </div>
+
+          {state?.error && (
+            <div className="text-red-500 text-sm">{state.error}</div>
+          )}
 
           <div>
             <Button

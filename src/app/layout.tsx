@@ -5,6 +5,8 @@ import { GeistMono } from "geist/font/mono";
 import { type Metadata } from "next";
 import { ThemeProvider } from "~/components/theme-provider";
 import { Toaster } from "sonner";
+import { UserProvider } from "~/server/auth";
+import { getUser } from "~/server/db/queries";
 
 export const metadata: Metadata = {
   title: "Create T3 App",
@@ -15,6 +17,8 @@ export const metadata: Metadata = {
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  // eslint-disable-next-line prefer-const
+  let userPromise = getUser();
   return (
     <html lang="en" className={`${GeistSans.variable} ${GeistMono.variable}`} suppressHydrationWarning>
       <body className="min-h-[100dvh]">
@@ -24,7 +28,8 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
+          {/*@ts-expect-error: idont know why*/}
+          <UserProvider userPromise={userPromise}>{children}</UserProvider>
           <Toaster />
         </ThemeProvider>
       </body>
